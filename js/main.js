@@ -178,12 +178,12 @@ window.onload = function(){
 		var left = node.offsetLeft;
 		var top = node.offsetTop;
 		current = node.offsetParent; // 取得元素的offsetParent
-		　// 一直循环直到根元素
-	　　while (current != null) {
-		　　left += current.offsetLeft;
-		　　top += current.offsetTop;
-		　　current = current.offsetParent;
-	　　}
+		// 一直循环直到根元素
+	    while (current != null) {
+		    left += current.offsetLeft;
+		    top += current.offsetTop;
+		    current = current.offsetParent;
+	    }
 		return {"left":left,"top":top};
 	}
 
