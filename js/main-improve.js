@@ -173,11 +173,19 @@ $(function () {
         // selected area
         $('#img2').css({'clip': clip});
 
+        var ratioX = 460/200;
+        var ratioY = 360/200;
+        var scaleX = 460/$main.width();
+        var scaleY = 360/$main.height();
+
+        var pClip = "rect(" + top/ratioY + "px," + right/ratioX + "px," + bottom/ratioY + "px," + left/ratioX + "px)";
+
         // preview
         $('#img3').css({
-            'top': -top,
-            'left': -left,
-            'clip': clip
+            'top': scaleY*(100-top/ratioY) - 100,
+            'left': scaleX*(100-left/ratioX) - 100,
+            'clip': pClip,
+            'transform': 'scale(' + scaleX + ', ' + scaleY + ')'
         });
     }
 	
