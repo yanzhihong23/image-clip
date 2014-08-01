@@ -1,19 +1,26 @@
 $(function () {
     document.onselectstart = new Function('event.returnValue=false;');
 
-    var isMouseDown = false;//判断鼠标是否按下
-    var contact = '';//当前拖动的触点
+    var isMouseDown = false;
+    var contact = '';
 
     var $main = $('#main');
     var $box = $('#box');
 
-    /*
-     事件区
-     */
-    $main.draggable({ containment: 'parent', drag: setChoice});
+    var startX,
+        startY,
+        startLeft,
+        startTop,
+        startWidth,
+        startHeight,
+        minX,
+        maxX,
+        minY,
+        maxY;
+
+    $main.draggable({ containment: 'parent', drag: clip});
 
     $('.minDiv').on('mousedown', function (e) {
-        contact = '';
         switch (e.target.id) {
             case 'left-up':
                 contact = 'leftUp';
@@ -63,7 +70,6 @@ $(function () {
     });
 
 
-    //拖动
     window.onmousemove = function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -99,21 +105,20 @@ $(function () {
                     break;
             }
 
-            setChoice();
+            clip();
         }
     };
-    //鼠标松开
+
     window.onmouseup = function (e) {
         isMouseDown = false;
-        contact = "";
+        contact = '';
     };
 
-    setChoice();//初始化选择区域可见
+    // init
+    clip();
 
-
-    //左边拖动
     function leftMove(e) {
-        var x = e.clientX;//鼠标横坐标
+        var x = e.clientX;
 
         if (x < minX) {
             x = minX;
@@ -125,9 +130,8 @@ $(function () {
         $main.css({'width': startWidth + len, 'left': startLeft - len});
     }
 
-    //上边拖动
     function upMove(e) {
-        var y = e.clientY;//鼠标纵坐标
+        var y = e.clientY;
         if (y < minY) {
             y = minY;
         } else if (y > maxY) {
@@ -138,9 +142,8 @@ $(function () {
         $main.css({'height': startHeight + len, 'top': startTop - len});
     }
 
-    //下边拖动
     function downMove(e) {
-        var y = e.clientY;//鼠标纵坐标
+        var y = e.clientY;
         var dMaxY = $box.offset().top + $box.height();
         if (y > dMaxY) {
             y = dMaxY;
@@ -150,9 +153,8 @@ $(function () {
         $main.css({'height': startHeight - len});
     }
 
-    //右边拖动
     function rightMove(e) {
-        var x = e.clientX;//鼠标横坐标
+        var x = e.clientX;
         var rMaxX = $box.offset().left + $box.width();
         if (x > rMaxX) {
             x = rMaxX;
@@ -161,30 +163,31 @@ $(function () {
         $main.css({'width': startWidth - len});
     }
 
-    //设置选择区域可见
-    function setChoice() {
+    function clip() {
         var top = $main.position().top;
         var left = $main.position().left;
         var right = left + $main.width();
         var bottom = top + $main.height();
 
         var clip = "rect(" + top + "px," + right + "px," + bottom + "px," + left + "px)";
+        // selected area
         $('#img2').css({'clip': clip});
-        /*$('#img3').css({
-            'top': -top,
-            'left': -left,
-            'clip': clip
-        })*/
-        preview({"top":top,"right":right,"bottom":bottom,"left":left});
+
+        var ratioX = 460/200;
+        var ratioY = 360/200;
+        var scaleX = 460/$main.width();
+        var scaleY = 360/$main.height();
+
+        var pClip = "rect(" + top/ratioY + "px," + right/ratioX + "px," + bottom/ratioY + "px," + left/ratioX + "px)";
+
+        // preview
+        $('#img3').css({
+            'top': scaleY*(100-top/ratioY) - 100,
+            'left': scaleX*(100-left/ratioX) - 100,
+            'clip': pClip,
+            'transform': 'scale(' + scaleX + ', ' + scaleY + ')'
+        });
     }
-
-	//预览
-	function preview(view){
-		var previewImg = document.getElementById("img3");
-		previewImg.style.top = -view.top + "px";
-		previewImg.style.left = -view.left + "px";
-		previewImg.style.clip = "rect("+view.top+"px,"+view.right+"px,"+view.bottom+"px,"+view.left+"px)";
-
-	}
+	
 });
 
